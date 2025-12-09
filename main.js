@@ -21,3 +21,18 @@ function animate() {
   renderer.render( scene, camera );
 }
 renderer.setAnimationLoop( animate );
+
+window.addEventListener("load", () => {
+  const loader = document.getElementById("loader");
+  const app = document.getElementById("app");
+
+  setTimeout(() => {
+    loader.style.opacity = "0";
+    loader.style.transition = "opacity 0.5s ease";
+
+    setTimeout(() => {
+      loader.style.display = "none";
+      app.classList.remove("app--hidden");
+    }, 500);
+  }, 800); // short delay to show GIF
+});

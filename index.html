@@ -1,17 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>My first three.js app</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <style>
-      body { margin: 0; }
-    </style>
-  </head>
-  <body>
-    <script type="module" src="/main.js"></script>
-    <div id="info">Description</div>
-    
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>House of Memories — Ramen Stand</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Isle-of-Dogs-ish fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Big title: blocky Japanese-ish; Body: mono-ish -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@700;900&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="assets\css\styles.css" />
+</head>
+<body class="isle-theme">
+
+  <!-- ========= LOADER ========= -->
+  <div id="loader" class="loader">
+  <div class="loader__gif-wrapper">
+    <iframe 
+      src="https://giphy.com/embed/q2ePk5TyEq8da"
+      width="300" 
+      height="300" 
+      frameBorder="0" 
+      class="giphy-embed"
+      allowFullScreen>
+    </iframe>
+  </div>
+
+  <p class="loader__text">Boiling noodles… please wait</p>
+</div>
+
+  <!-- ========= MAIN APP ========= -->
+  <div id="app" class="app app--hidden">
+    <!-- ===== TITLE SCREEN ===== -->
+    <section id="title-screen" class="title-screen">
+      <div class="title-screen__inner">
+        <!-- Fake Kanji-style main title -->
+        <h1 class="title-kanji">ラメン記</h1>
+        <!-- English subtitle in Isle-of-Dogs yellow -->
+        <p class="title-sub">(House of Memories — Ramen Stand)</p>
+        <button id="enter-btn" class="btn btn--primary">
+          Enter the Stand
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== MAIN EXPERIENCE ===== -->
+    <main id="experience" class="experience experience--hidden">
+      <!-- 3D Ramen Stand Canvas -->
+      <canvas id="ramen-scene" class="ramen-scene"></canvas>
+
+      <!-- UI OVERLAY -->
+      <div id="ui-overlay" class="ui-overlay">
+
+        <!-- OC DIALOG BOX -->
+        <div id="dialog-box" class="dialog dialog--hidden">
+          <div class="dialog__portrait">
+            <!-- OC portrait placeholder (you’ll swap later) -->
+            <img
+              src="assets/images/oc-placeholder.png"
+              alt="Ramen host"
+              class="dialog__portrait-img"
+            />
+          </div>
+          <div class="dialog__content">
+            <div class="dialog__name">Ramen Host</div>
+            <p id="dialog-text" class="dialog__text">
+              Hey, stranger. You found this little stand… take a seat.
+            </p>
+            <div id="dialog-choices" class="dialog__choices">
+              <button class="btn btn--choice" data-choice="order">
+                Order ramen
+              </button>
+              <button class="btn btn--choice" data-choice="explore">
+                Look around
+              </button>
+              <button class="btn btn--choice" data-choice="exit">
+                Exit
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORDER MENU PANEL -->
+        <section id="menu-panel" class="panel panel--menu panel--hidden">
+          <header class="panel__header">
+            <h2 class="panel__title">Menu</h2>
+            <button class="panel__close" data-close="menu-panel">×</button>
+          </header>
+          <ul class="menu-list">
+            <li class="menu-item" data-dish="kelowna">
+              <span class="menu-item__name">Kelowna Poutine</span>
+              <span class="menu-item__desc">Cozy, messy, full of friends.</span>
+            </li>
+            <li class="menu-item" data-dish="almaty">
+              <span class="menu-item__name">Almaty Beshbarmak</span>
+              <span class="menu-item__desc">Mountains, childhood, trust.</span>
+            </li>
+            <li class="menu-item" data-dish="dubai">
+              <span class="menu-item__name">Dubai Shawarma</span>
+              <span class="menu-item__desc">Lonely streets, bright dreams.</span>
+            </li>
+            <li class="menu-item" data-dish="liminal">
+              <span class="menu-item__name">Liminal Ramen</span>
+              <span class="menu-item__desc">
+                For nights when the world feels in-between.
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- “TABLE” WHERE THE DISH APPEARS + STORY -->
+        <section id="table-panel" class="panel panel--table panel--hidden">
+          <header class="panel__header">
+            <h2 id="table-dish-name" class="panel__title">Your Order</h2>
+            <button class="panel__close" data-close="table-panel">×</button>
+          </header>
+          <div class="table-panel__body">
+            <div class="table-panel__dish-visual">
+              <!-- Placeholder image; you’ll swap per dish via JS -->
+              <img
+                id="dish-image"
+                src="assets/images/dish-placeholder.png"
+                alt="Served dish"
+              />
+            </div>
+            <div class="table-panel__story">
+              <p id="dish-story">
+                This is where the OC will tell a story about this place
+                and the people you met there.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- GUESTBOARD PANEL -->
+        <section
+          id="guestboard-panel"
+          class="panel panel--guestboard panel--hidden"
+        >
+          <header class="panel__header">
+            <h2 class="panel__title">Guest Board</h2>
+            <button class="panel__close" data-close="guestboard-panel">×</button>
+          </header>
+
+          <p class="panel__intro">
+            The real me probably shared this with you because I care.
+            Add yourself to the board so I don’t forget who you were in this moment.
+          </p>
+
+          <form id="guest-form" class="guest-form">
+            <label class="guest-form__field">
+              <span>Nickname</span>
+              <input type="text" name="nickname" required />
+            </label>
+            <label class="guest-form__field">
+              <span>How do we know each other?</span>
+              <textarea name="relation" rows="3" required></textarea>
+            </label>
+            <label class="guest-form__field">
+              <span>Contact (optional)</span>
+              <input type="text" name="contact" />
+            </label>
+            <label class="guest-form__field">
+              <span>Photo (optional)</span>
+              <input type="file" name="photo" accept="image/*" />
+            </label>
+            <button type="submit" class="btn btn--primary">
+              Add to board
+            </button>
+          </form>
+
+          <div id="guestboard-list" class="guestboard-list">
+            <!-- Guest cards will be injected here by JS -->
+          </div>
+        </section>
+
+        <!-- RADIO / MUSIC CONTROL -->
+        <section id="radio-panel" class="radio-panel">
+          <button id="radio-toggle" class="btn btn--small">
+            ▶ Radio
+          </button>
+          <span id="radio-track-label" class="radio-panel__label">
+            Now Playing: —
+          </span>
+        </section>
+
+        <!-- EXIT BUTTON -->
+        <button id="exit-btn" class="exit-btn">
+          Exit Stand
+        </button>
+
+      </div>
+    </main>
+
+    <!-- GOODBYE SCREEN -->
+    <section id="goodbye-screen" class="goodbye-screen goodbye-screen--hidden">
+      <div class="goodbye-screen__inner">
+        <h2 class="goodbye-title">またね</h2>
+        <p class="goodbye-sub">Goodbye — hope our paths meet again.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Main JS (we’ll fill this later) -->
+  <script type="module" src="main.js"></script>
+</body>
 </html>
-    
